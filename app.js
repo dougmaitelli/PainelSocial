@@ -14,7 +14,7 @@ var users = require('./routes/users');
 
 var app = express();
 
-app.set('SECRET', config.secret);
+app.set('SECRET', (process.env.SECRETS || config.secret));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,7 +35,8 @@ app.use(function(req, res, next) {
   next();
 });
 
-mongoose.connect(config.database, function(err) {
+var database = process.env.MONGOLAB_URI || config.database;
+mongoose.connect(database, function(err) {
     if(err) {
         console.log('connection error', err);
     } else {
