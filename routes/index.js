@@ -1,10 +1,14 @@
 var express = require('express');
 var jwt = require("jsonwebtoken");
-var config = require('../config')
+var config = require('../config');
 var router = express.Router();
 
 var mongoose = require('mongoose');
 var User = require('../models/User.js');
+
+var app = express();
+
+app.set('SECRET', (process.env.SECRETS || config.secret));
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
