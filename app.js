@@ -11,6 +11,7 @@ var config = require('./config');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var demands = require('./routes/demand');
 
 var app = express();
 
@@ -44,24 +45,10 @@ mongoose.connect(database, function(err) {
     }
 });
 
-app.use(function(req, res, next) {
-  if(req.url == '/register'){
-    console.log('Murilo');
-    next();
-  }else{
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
-    if (token) {
-      jwt.verify(token, app.get('SECRET'), function(err, decoded) {      
-        if (err) { return res.json({ success: false, message: 'Failed to authenticate token.' }); }
-        else { req.decoded = decoded; next(); }
-      });
-    } else {
-      return res.status(403).send({ success: false, message: 'No token provided.' });
-    }
-  }
-});
 app.use('/', routes);
 app.use('/users', users);
+
+app.use('/demands', demands);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
