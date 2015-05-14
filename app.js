@@ -12,6 +12,7 @@ var config = require('./config');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var demands = require('./routes/demand');
+var comments = require('./routes/comment');
 
 var app = express();
 
@@ -47,7 +48,7 @@ mongoose.connect(database, function(err) {
 
 app.use('/', routes);
 app.use('/users', users);
-
+app.use('/comments', comments);
 app.use('/demands', demands);
 
 // catch 404 and forward to error handler
