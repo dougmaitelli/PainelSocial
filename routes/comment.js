@@ -52,4 +52,12 @@ router.post('/:id', function(req, res, next) {
   });
 });
 
+router.delete('/:id', function(req, res, next) {
+
+  Comment.findByIdAndRemove(req.params.id).exec(function(err, comment) {
+    if (err) return console.error(err);
+    res.json({ type: true, data: comment });
+  });
+});
+
 module.exports = router;
