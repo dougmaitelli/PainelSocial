@@ -27,10 +27,9 @@ router.post('/authenticate', function(req, res, next) {
       });
     } else {
       if (user) {
-        res.json({
-          type: true,
-          data: user,
-          token: user.token
+        user.token = jwt.sign(user, config.secret, {algorithm: 'none', expiresInMinutes: 1440});
+        user.save(function(err, user1) {
+          res.json({ type: true, data: user1, token: user1.token });
         });
       } else {
         res.json({
