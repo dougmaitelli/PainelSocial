@@ -19,7 +19,7 @@ router.use(function(req, res, next) {
       else { req.decoded = decoded; next(); }
     });
   } else {
-    return res.status(403).send({ success: false, message: 'No token provided.' });
+    return res.status(403).send({ success: false, message: token });
   }
 });
 
