@@ -43,15 +43,15 @@ router.post('/authenticate', function(req, res, next) {
 
 router.post('/register', function(req, res, next) {
   if (typeof(req.body.name) == "undefined" || typeof(req.body.email) == "undefined" || typeof(req.body.password) == "undefined"){
-    res.json({ type: false, data: "Invalid data." });
+    res.status(400).send({ type: false, data: "Invalid data." });
   }
   User.findOne({email: req.body.email}, function(err, user) {
     if (err) {
-      res.json({ type: false, data: "Error occured: " + err });
+      res.status(500).send({ type: false, data: "Error occured: " + err });
       return ;
     }
     if (user) {
-      res.json({
+      res.status(406).send({
         type: false,
         data: "User already exists!",
         user: user

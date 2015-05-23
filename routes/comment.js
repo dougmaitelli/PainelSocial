@@ -26,6 +26,7 @@ router.use(function(req, res, next) {
 router.get('/:id', function(req, res, next) {
   Comment.findById(req.params.id).exec(function(err, comment) {
     if (err) return console.error(err);
+    console.log(comment);
     var images = [];
     Images.find({commentId: comment._id}, function(err, image) {
       images.push(image);
