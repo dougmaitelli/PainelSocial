@@ -63,7 +63,7 @@ router.post('/register', function(req, res, next) {
     userModel.name = req.body.name;
     userModel.password = req.body.password;
     userModel.save(function(err, user) {
-      user.token = jwt.sign(user, app.get('SECRET'), {algorithm: 'none', expiresInMinutes: 1440});
+      user.token = jwt.sign(user, app.get('SECRET'), {expiresInMinutes: 1440});
       user.save(function(err, user1) {
         res.json({ type: true, data: user1, token: user1.token });
       });
