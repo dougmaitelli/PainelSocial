@@ -40,7 +40,7 @@ router.post('/', function(req, res, next){
   demandModel.save(function(err, demand) {
     for (i in req.body.images){
       var ImageModel = new Images();
-      ImageModel.image = req.body.images[i];
+      ImageModel.image = req.body.images[i].image;
       ImageModel.demandId = demand._id;
       ImageModel.save();
     }
@@ -49,18 +49,45 @@ router.post('/', function(req, res, next){
 });
 
 router.get('/:id', function(req, res, next) {
+  var queryDemand = Demand.findById(req.params.id);
+/*
+  queryDemand.exec(function(err, demand){
+    if (err) return console.error(err);
+    demand.comments = [];
+    var queryComment = Comment.find({demandId: demand._id});
+    queryComment.exec(function(err, comment){
+      comment.images = [];
+      var queryImage = Images.find({commentId: comment._id});
+      queryImage.exec(function(err, image){
+        comment.images.push(image);
+      });
+      demand.comments.push(comment);
+    });
+  res.json({ type: true, demand: demand });
+  });
+*/
+
   Demand.findById(req.params.id).exec(function(err, demand) {
     if (err) return console.error(err);
     var comments = [];
+    demand.comments = [];
     Comment.find({demandId: demand._id}, function(err, comment) {
+      comment.images = [];
+      Images.find({commentId: comment._id}, function(err, image) {
+        comment.images.push(image);
+      });
       comments.push(comment);
+      demand.comments.push(comment);
     });
     var images = [];
+    demand.images = [];
     Images.find({demandId: demand._id}, function(err, image) {
+      demand.images.push(image);
       images.push(image);
-      res.json({ type: true, demand: demand, images: images, comments: comments });
+      res.json({ type: true, demand: demand, images: images });
     });
   });
+
 });
 
 router.post('/:id/comment', function(req, res, next) {
