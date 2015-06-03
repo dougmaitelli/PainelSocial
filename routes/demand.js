@@ -31,26 +31,23 @@ router.get('/', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-
   var demandModel = new Demand();
   demandModel.description = req.body.description;
   demandModel.longitude = req.body.longitude;
   demandModel.latitude = req.body.latitude;
   demandModel.creator = req.decoded._id;
-
   demandModel.save(function(err, demand) {
-
     for (i in req.body.images){
-      var ImageModel = new Images();
-      ImageModel.image = req.body.images[i].image;
-      ImageModel.demandId = demand._id;
-      ImageModel.creator = req.decoded._id;
-      ImageModel.save(function(err, image){
-        demand.images.push(image._id);
-      });
+      req.body.images[i].creator = req.decoded._id;
+      req.body.images[i].demandId = demand._id;
     }
-    demand.save();
-
+    Images.create(req.body.images, function (err, images) {
+      if (err) return console.error(err);
+      for (image in images){
+        demand.images.push(images[image]._id);
+      }
+      demand.save();
+    });
     res.json({ type: true, data: demand });
   });
 });
@@ -60,36 +57,35 @@ router.get('/:id', function(req, res, next) {
   queryDemand.populate('comments images');
   queryDemand.exec(function(err, demand){
     if (err) return console.error(err);
-    res.json({ type: true, demand: demand });
+    res.json({ type: true, data: demand });
   });
 });
 
 router.post('/:id/comment', function(req, res, next) {
-
-  Demand.findById(req.params.id).exec(function(err, demand) {
-    if (err) return console.error(err);
-    var commentModel = new Comment();
-    commentModel.description = req.body.description;
-    commentModel.demandId = demand._id;
-    commentModel.creator = req.decoded._id;
-    commentModel.save(function(err, comment){
-      for (i in req.body.images){
-        var ImageModel = new Images();
-        ImageModel.image = req.body.images[i];
-        ImageModel.commentId = comment._id;
-        ImageModel.creator = req.decoded._id;
-        ImageModel.save();
+  var commentModel = new Comment();
+  commentModel.description = req.body.description;
+  commentModel.demandId = req.params.id;
+  commentModel.creator = req.decoded._id;
+  commentModel.save(function(err, comment){
+    for (i in req.body.images){
+      req.body.images[i].creator = req.decoded._id;
+      req.body.images[i].commentId = comment._id;
+    }
+    Images.create(req.body.images, function (err, images) {
+      if (err) return console.error(err);
+      for (image in images){
+        comment.images.push(images[image]._id);
       }
-      res.json({ type: true, data: comment });
-    })
-  });
+      comment.save();
+    });
+    res.json({ type: true, data: comment });
+  })
 });
 
 router.get('/:id/comment', function(req, res, next) {
   console.log(req.decoded._id);
   var queryComent = Comment.find({demandId: req.params.id});
   queryComent.populate("images");
-
   queryComent.exec(function(err, comments) {
     if (err) return console.error(err);
     res.json({ type: true, data: comments });
