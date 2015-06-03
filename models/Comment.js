@@ -3,7 +3,8 @@ var Schema = mongoose.Schema;
 
 var CommentSchema = new Schema({
     description: String,
-    demandId: { type: String, required: true },
+    demandId: { type: String, ref: 'Demand' },
+    images : [{ type: Schema.Types.ObjectId, ref: 'Image' }],
     created_at: { type: Date, default: Date.now }
 });
 
