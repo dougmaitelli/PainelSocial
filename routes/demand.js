@@ -36,6 +36,7 @@ router.post('/', function(req, res, next){
   demandModel.description = req.body.description;
   demandModel.longitude = req.body.longitude;
   demandModel.latitude = req.body.latitude;
+  demandModel.creator = req.decoded._id;
 
   demandModel.save(function(err, demand) {
 
@@ -43,6 +44,7 @@ router.post('/', function(req, res, next){
       var ImageModel = new Images();
       ImageModel.image = req.body.images[i].image;
       ImageModel.demandId = demand._id;
+      ImageModel.creator = req.decoded._id;
       ImageModel.save(function(err, image){
         demand.images.push(image._id);
       });
@@ -69,11 +71,13 @@ router.post('/:id/comment', function(req, res, next) {
     var commentModel = new Comment();
     commentModel.description = req.body.description;
     commentModel.demandId = demand._id;
+    commentModel.creator = req.decoded._id;
     commentModel.save(function(err, comment){
       for (i in req.body.images){
         var ImageModel = new Images();
         ImageModel.image = req.body.images[i];
         ImageModel.commentId = comment._id;
+        ImageModel.creator = req.decoded._id;
         ImageModel.save();
       }
       res.json({ type: true, data: comment });
@@ -82,6 +86,7 @@ router.post('/:id/comment', function(req, res, next) {
 });
 
 router.get('/:id/comment', function(req, res, next) {
+  console.log(req.decoded._id);
   var queryComent = Comment.find({demandId: req.params.id});
   queryComent.populate("images");
 
