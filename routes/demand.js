@@ -65,6 +65,10 @@ router.post('/:id/plus', function(req, res, next){
   var queryDemand = Demand.findById(req.params.id);
   queryDemand.exec(function(err, demand){
     if (err) return console.error(err);
+    var queryRate = Rate.find({creator: req.decoded._id, demandId: demand._id});
+    queryRate.exec(function(err, rate){
+      console.log(rate);
+    });
     var RateModel = new Rate();
     RateModel.status = 1;
     RateModel.demandId = demand._id;
