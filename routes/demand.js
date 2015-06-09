@@ -67,18 +67,25 @@ router.post('/:id/plus', function(req, res, next){
     if (err) return console.error(err);
     var queryRate = Rate.find({creator: req.decoded._id, demandId: demand._id});
     queryRate.exec(function(err, rate){
+      var rateModel = new Rate();
+      if(rate == []){
+        rateModel.status = 1;
+        rateModel.demandId = demand._id;
+        rateModel.creator = req.decoded._id;
+      }else{
+        rateModel.status = 1
+        rateModel.demandId = rate.demandId;
+        rateModel.creator = rate.demandId;
+      }
       console.log(rate);
-    });
-    var RateModel = new Rate();
-    RateModel.status = 1;
-    RateModel.demandId = demand._id;
-    RateModel.creator = req.decoded._id;
-    RateModel.save(function(err, rate){
-      demand.rate.push(rate._id);
-      demand.save(function(err, demand1) {
-        res.json({ type: true, data: demand1 });
+      rateModel.save(function(err, rate1){
+        demand.rate.push(rate1._id);
+        demand.save(function(err, demand1) {
+          res.json({ type: true, data: demand1 });
+        });
       });
     });
+
   });
 });
 
