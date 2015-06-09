@@ -109,16 +109,25 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.post('/:id/comment', function(req, res, next) {
-  var commentModel = new Comment();
-  commentModel.description = req.body.description;
-  commentModel.demandId = req.params.id;
-  commentModel.creator = req.decoded._id;
-  for (i in req.body.images){
-    commentModel.images.push(req.body.images[i]);
-  }
-  commentModel.save(function(err, comment){
-    res.json({ type: true, data: comment });
+  
+  var queryDemand = Demand.findById(req.params.id);
+  queryDemand.exec(function(err, demand){
+    if (err) return console.error(err);
+
+    var commentModel = new Comment();
+    commentModel.description = req.body.description;
+    commentModel.demandId = req.params.id;
+    commentModel.creator = req.decoded._id;
+    for (i in req.body.images){
+      commentModel.images.push(req.body.images[i]);
+    }
+    commentModel.save(function(err, comment){
+      demand.comments.push(comment._id);
+      demand.save();
+      res.json({ type: true, data: comment });
+    });
   });
+
 });
 
 router.get('/:id/comment', function(req, res, next) {
