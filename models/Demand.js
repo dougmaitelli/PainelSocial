@@ -6,8 +6,9 @@ var DemandSchema = new Schema({
     description: String,
     longitude: Number,
     latitude: Number,
+    rate : [{ type: Schema.Types.ObjectId, ref: 'Rate' }],
     comments : [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-    images : [{ type: Schema.Types.ObjectId, ref: 'Image' }],
+    images : [String],
     created_at: { type: Date, default: Date.now }
 });
 

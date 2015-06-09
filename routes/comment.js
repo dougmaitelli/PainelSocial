@@ -36,18 +36,14 @@ router.get('/:id', function(req, res, next) {
 });
 
 router.post('/:id', function(req, res, next) {
-
   Comment.findById(req.params.id).exec(function(err, comment) {
     if (err) return console.error(err);
-
     comment.description = req.body.description;
+    comment.images = [];
+    for (i in req.body.images){
+      comment.images.push(req.body.images[i]);
+    }
     comment.save(function(err, comment){
-      for (i in req.body.images){
-        var ImageModel = new Images();
-        ImageModel.image = req.body.images[i];
-        ImageModel.commentId = comment._id;
-        ImageModel.save();
-      }
       res.json({ type: true, data: comment });
     })
   });

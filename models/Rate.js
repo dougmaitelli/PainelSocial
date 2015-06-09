@@ -1,12 +1,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var CommentSchema = new Schema({
+var RateSchema = new Schema({
+    status: Number,
     creator: { type: Schema.Types.ObjectId, ref: 'User' },
-    description: String,
     demandId: { type: String, ref: 'Demand' },
-    images : [String],
     created_at: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Comment', CommentSchema);
+module.exports = mongoose.model('Rate', RateSchema);
