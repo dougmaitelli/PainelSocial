@@ -25,7 +25,7 @@ router.use(function(req, res, next) {
 });
 
 router.get('/', function(req, res, next){
-  Demand.find(function(err, demands){
+  Demand.find({}, 'description longitude latitude created_at', function(err, demands){
     if (err) return console.error(err);
     res.json({type: true, data: demands});
   });
