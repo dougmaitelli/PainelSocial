@@ -62,27 +62,30 @@ router.post('/:id', function(req, res, next){
 });
 
 router.post('/:id/plus', function(req, res, next){
+
   var queryDemand = Demand.findById(req.params.id);
   queryDemand.exec(function(err, demand){
     if (err) return console.error(err);
-    var queryRate = Rate.find({creator: req.decoded._id, demandId: demand._id});
+    var queryRate = Rate.findOne({creator: req.decoded._id, demandId: demand._id});
     queryRate.exec(function(err, rate){
-      var rateModel = new Rate();
-      if(rate == []){
-        rateModel.status = 1;
-        rateModel.demandId = demand._id;
-        rateModel.creator = req.decoded._id;
+      if(rate == null){
+        var rate = new Rate();
+        rate.status = 1;
+        rate.demandId = demand._id;
+        rate.creator = req.decoded._id;
       }else{
-        rateModel.status = 1
-        rateModel.demandId = rate.demandId;
-        rateModel.creator = rate.demandId;
+        rate.status = 1
       }
       console.log(rate);
-      rateModel.save(function(err, rate1){
-        demand.rate.push(rate1._id);
-        demand.save(function(err, demand1) {
-          res.json({ type: true, data: demand1 });
-        });
+      rate.save(function(err, rate1){
+        if(demand.rate.indexOf(rate1._id) == -1){
+          demand.rate.push(rate1._id);
+          demand.save(function(err, demand1) {
+            res.json({ type: true, data: demand1 });
+          });
+        }else{
+          res.json({ type: true, data: demand });
+        }
       });
     });
 
@@ -93,16 +96,29 @@ router.post('/:id/minus', function(req, res, next){
   var queryDemand = Demand.findById(req.params.id);
   queryDemand.exec(function(err, demand){
     if (err) return console.error(err);
-    var RateModel = new Rate();
-    RateModel.status = 0;
-    RateModel.demandId = demand._id;
-    RateModel.creator = req.decoded._id;
-    RateModel.save(function(err, rate){
-      demand.rate.push(rate._id);
-      demand.save(function(err, demand1) {
-        res.json({ type: true, data: demand1 });
+    var queryRate = Rate.findOne({creator: req.decoded._id, demandId: demand._id});
+    queryRate.exec(function(err, rate){
+      if(rate == null){
+        var rate = new Rate();
+        rate.status = 0;
+        rate.demandId = demand._id;
+        rate.creator = req.decoded._id;
+      }else{
+        rate.status = 0
+      }
+      console.log(rate);
+      rate.save(function(err, rate1){
+        if(demand.rate.indexOf(rate1._id) == -1){
+          demand.rate.push(rate1._id);
+          demand.save(function(err, demand1) {
+            res.json({ type: true, data: demand1 });
+          });
+        }else{
+          res.json({ type: true, data: demand });
+        }
       });
     });
+
   });
 });
 
