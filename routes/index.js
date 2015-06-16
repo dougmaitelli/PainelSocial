@@ -53,8 +53,7 @@ router.post('/register', function(req, res, next) {
     if (user) {
       res.status(406).send({
         type: false,
-        data: "User already exists!",
-        user: user
+        data: "User already exists!"
       });
       return ;
     }
