@@ -68,6 +68,7 @@ router.post('/:id/plus', function(req, res, next){
     if (err) return console.error(err);
     var queryRate = Rate.findOne({creator: req.decoded._id, demandId: demand._id});
     queryRate.exec(function(err, rate){
+      console.log(rate);
       if(rate == null){
         var rate = new Rate();
         rate.status = 1;
@@ -88,12 +89,11 @@ router.post('/:id/plus', function(req, res, next){
         }
       });
     });
-
   });
 });
 
 router.post('/:id/minus', function(req, res, next){
-  var queryDemand = Demand.findById(req.params.id);
+ var queryDemand = Demand.findById(req.params.id);
   queryDemand.exec(function(err, demand){
     if (err) return console.error(err);
     var queryRate = Rate.findOne({creator: req.decoded._id, demandId: demand._id});
@@ -118,15 +118,25 @@ router.post('/:id/minus', function(req, res, next){
         }
       });
     });
-
   });
 });
 
 router.get('/:id', function(req, res, next) {
-  var queryDemand = Demand.findById(req.params.id);
-  queryDemand.populate('comments');
+  var queryDemand = Demand.findById(req.params.id).lean(true);
+  queryDemand.populate('comments rate');
   queryDemand.exec(function(err, demand){
     if (err) return console.error(err);
+    demand.minusCount = 0;
+    demand.plusCount = 0;
+    demand.currentVote = null;
+    for (var i in demand.rate) {
+      if(demand.rate[i].status == 1)
+        demand.plusCount++;
+      if(demand.rate[i].status == 0)
+        demand.minusCount++;
+      if(demand.rate[i].creator == req.decoded._id)
+        demand.currentVote = demand.rate[i].status;
+    };
     res.json({ type: true, data: demand });
   });
 });
