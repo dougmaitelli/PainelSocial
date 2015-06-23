@@ -29,7 +29,7 @@ router.post('/authenticate', function(req, res, next) {
       if (user) {
         user.token = jwt.sign(user, app.get('SECRET'), {expiresInMinutes: 1440});
         user.save(function(err, user1) {
-          res.json({ type: true, data: user1 });
+          res.json({ type: true, data: user1, token: user1.token });
         });
       } else {
         res.json({
